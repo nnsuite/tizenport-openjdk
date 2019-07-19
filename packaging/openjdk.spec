@@ -1,3 +1,5 @@
+%define debug_package %{nil}
+
 Name:		openjdk
 Version:	1.8.0.221
 Release:	0
@@ -75,7 +77,18 @@ pushd install
 mv * %{buildroot}%{_prefix}/java/
 popd
 
+mkdir -p %{buildroot}%{_bindir}
+pushd %{buildroot}%{_bindir}
+ln -sf %{_prefix}/java/jdk1.8.0_221/bin/jar jar
+ln -sf %{_prefix}/java/jdk1.8.0_221/bin/java java
+ln -sf %{_prefix}/java/jdk1.8.0_221/bin/javac javac
+ln -sf %{_prefix}/java/jdk1.8.0_221/bin/javah javah
+ln -sf %{_prefix}/java/jdk1.8.0_221/bin/javap javap
+ln -sf %{_prefix}/java/jdk1.8.0_221/bin/javadoc javadoc
+popd
+
 %files
 %manifest openjdk.manifest
 %defattr(-,root,root,-)
 %{_prefix}/java
+%{_bindir}/*

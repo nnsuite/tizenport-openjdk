@@ -8,7 +8,7 @@ License:        Apache-1.1 AND Apache-2.0 AND GPL-1.0-or-later AND GPL-2.0-only 
 Group:          Development/Languages/Java
 Url:            http://openjdk.java.net/
 
-Source0:	openjdk-%{version}-%{release}.tar.gz
+Source0:	openjdk-%{version}.tar.gz
 
 Source1000:	jdk-8u221-linux-arm64-vfp-hflt.tar.gz.00
 Source1001:	jdk-8u221-linux-arm64-vfp-hflt.tar.gz.01
@@ -52,6 +52,7 @@ This is RPM package of the downloaded tar.gz.
 Do NOT install this into deployed images.
 
 %prep
+%setup -q
 
 cp %{SOURCE2000} .
 mkdir -p install

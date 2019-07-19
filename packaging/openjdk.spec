@@ -52,18 +52,19 @@ This is RPM package of the downloaded tar.gz.
 Do NOT install this into deployed images.
 
 %prep
-
-%ifarch aarch64
-cat %{SOURCE1000} %{SOURCE1001} > jdk.tar.gz
-%endif
-%ifarch x86_64
-cat %{SOURCE1100} %{SOURCE1101} %{SOURCE1102} %{SOURCE1103} > jdk.tar.gz
-%endif
+%setup -q
 
 cp %{SOURCE2000} .
 mkdir -p install
 pushd install
-tar -xf jdk.tar.gz
+
+%ifarch aarch64
+cat %{SOURCE1000} %{SOURCE1001} | tar -xz
+%endif
+%ifarch x86_64
+cat %{SOURCE1100} %{SOURCE1101} %{SOURCE1102} %{SOURCE1103} | tar -xz
+%endif
+
 popd
 
 %build

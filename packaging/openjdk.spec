@@ -52,7 +52,6 @@ This is RPM package of the downloaded tar.gz.
 Do NOT install this into deployed images.
 
 %prep
-%setup -q
 
 cp %{SOURCE2000} .
 mkdir -p install

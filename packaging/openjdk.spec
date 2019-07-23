@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 
 Name:		openjdk
-Version:	1.8.0.221
+Version:	1.8.0.222
 Release:	0
 Summary:	OpenJDK 8 Repackaging Official Downloads
 License:        Apache-1.1 AND Apache-2.0 AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-with-classpath-exception AND LGPL-2.0-only AND MPL-1.0 AND MPL-1.1 AND SUSE-Public-Domain AND W3C
@@ -10,62 +10,22 @@ Url:            http://openjdk.java.net/
 
 Source0:	openjdk-%{version}.tar.gz
 
-Source1000:	jdk-8u221-linux-arm64-vfp-hflt.tar.gz.00
-Source1001:	jdk-8u221-linux-arm64-vfp-hflt.tar.gz.01
-Source1100:	jdk-8u221-linux-x64.tar.gz.00
-Source1101:	jdk-8u221-linux-x64.tar.gz.01
-Source1102:	jdk-8u221-linux-x64.tar.gz.02
-Source1103:	jdk-8u221-linux-x64.tar.gz.03
-
 Source2000:	openjdk.manifest
 
-ExclusiveArch:	aarch64 x86_64
-
-Requires:	/bin/basename
-Requires:	/bin/cat
-Requires:	/bin/cp
-Requires:	/bin/gawk
-Requires:	/bin/grep
-Requires:	/bin/ln
-Requires:	/bin/ls
-Requires:	/bin/mkdir
-Requires:	/bin/mv
-Requires:	/bin/pwd
-Requires:	/bin/rm
-Requires:	/bin/sed
-Requires:	/bin/sort
-Requires:	/bin/touch
-Requires:	/usr/bin/cut
-Requires:	/usr/bin/dirname
-Requires:	/usr/bin/expr
-Requires:	/usr/bin/find
-Requires:	/usr/bin/tail
-Requires:	/usr/bin/tr
-Requires:	/usr/bin/wc
-Requires:	/bin/sh
+ExclusiveArch:	aarch64 x86_64 %ix86 armv7l
 
 %description
 The full openjdk 8 downloaded at
 https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 This is RPM package of the downloaded tar.gz.
+Fetched deb files and extracted data.tar.xz from
+https://packages.debian.org/sid/openjdk-8-jdk-headless
 
 Do NOT install this into deployed images.
 
 %prep
 %setup -q
-
 cp %{SOURCE2000} .
-mkdir -p install
-pushd install
-
-%ifarch aarch64
-cat %{SOURCE1000} %{SOURCE1001} | tar -xz
-%endif
-%ifarch x86_64
-cat %{SOURCE1100} %{SOURCE1101} %{SOURCE1102} %{SOURCE1103} | tar -xz
-%endif
-
-popd
 
 %build
 
@@ -73,23 +33,37 @@ popd
 
 %install
 
-mkdir -p %{buildroot}%{_prefix}/java/
-pushd install
-mv * %{buildroot}%{_prefix}/java/
-popd
 
-mkdir -p %{buildroot}%{_bindir}
-pushd %{buildroot}%{_bindir}
-ln -sf %{_prefix}/java/jdk1.8.0_221/bin/jar jar
-ln -sf %{_prefix}/java/jdk1.8.0_221/bin/java java
-ln -sf %{_prefix}/java/jdk1.8.0_221/bin/javac javac
-ln -sf %{_prefix}/java/jdk1.8.0_221/bin/javah javah
-ln -sf %{_prefix}/java/jdk1.8.0_221/bin/javap javap
-ln -sf %{_prefix}/java/jdk1.8.0_221/bin/javadoc javadoc
+# armv7l / armel
+%ifarch armv7l
+%define archivepath %{_builddir}/%{name}-%{version}/openjdk-8-jdk-headless_8u222-b10-1/armel/data.tar
+%endif
+
+# aarch64 / arm64
+%ifarch aarch64
+%define archivepath %{_builddir}/%{name}-%{version}/openjdk-8-jdk-headless_8u222-b10-1/arm64/data.tar
+%endif
+
+# x86_64 / amd64
+%ifarch x86_64
+%define archivepath %{_builddir}/%{name}-%{version}/openjdk-8-jdk-headless_8u222-b10-1/amd64/data.tar
+%endif
+
+# ix86 / i386
+%ifarch %ix86
+%define archivepath %{_builddir}/%{name}-%{version}/openjdk-8-jdk-headless_8u222-b10-1/i386/data.tar
+%endif
+
+pushd %{buildroot}
+xz -d %{archivepath}.xz
+tar -xf %{archivepath}
+pushd usr
+# remove doc
+rm -rf share
+popd
 popd
 
 %files
 %manifest openjdk.manifest
 %defattr(-,root,root,-)
-%{_prefix}/java
-%{_bindir}/*
+/usr/lib/jvm
